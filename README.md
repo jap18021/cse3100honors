@@ -2,7 +2,7 @@
 
 ## What is our goal?
 
-<Placeholder>
+< Placeholder >
 
 ### By the end of the semester, we plan to:
 
