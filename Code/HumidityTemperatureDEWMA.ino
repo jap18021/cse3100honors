@@ -33,33 +33,25 @@ void loop() {
   // calculate expected values
   expectedtemp = wmatemp + deltatemp;
   expectedhumidity = wmahumidity + deltahumidity;
+  // get new reads
   readtemp = HTS.readTemperature();
   readhumidity = HTS.readHumidity();
-  // if the model did not predict temperature/humidity print the new data
-  // update delta and wma
-  if (abs(readtemp - expectedtemp) > epsilontemp) {
-    deltatemp = sdelta(deltatemp, readtemp - wmatemp, beta);
-    wmatemp = svalue(wmatemp, readtemp, alpha);
-    Serial.print("New temperature WMA: ");
+  deltatemp = sdelta(deltatemp, readtemp - wmatemp, beta);
+  wmatemp = svalue(wmatemp, readtemp, alpha);
+  // compare new wma with expected
+  if (abs(wmatemp - expectedtemp) > epsilontemp) {
+    Serial.print("Temperature WMA: ");
     Serial.println(wmatemp);
-    Serial.print("New temperature delta: ");
+    Serial.print("Temperature delta: ");
     Serial.println(deltatemp);
   }
-  else {
-    deltatemp = sdelta(deltatemp, readtemp - wmatemp, beta);
-    wmatemp = svalue(wmatemp, readtemp, alpha);
-  }
-  if (abs(readhumidity - expectedhumidity) > epsilonhumidity) {
-    deltahumidity = sdelta(deltahumidity, readhumidity - wmahumidity, beta);
-    wmahumidity = svalue(wmahumidity, readhumidity, alpha);
-    Serial.print("New humidity WMA: ");
+  deltahumidity = sdelta(deltahumidity, readhumidity - wmahumidity, beta);
+  wmahumidity = svalue(wmahumidity, readhumidity, alpha);
+  if (abs(wmahumidity - expectedhumidity) > epsilonhumidity) {
+    Serial.print("Humidity WMA: ");
     Serial.println(wmahumidity);
-    Serial.print("New humidity delta: ");
+    Serial.print("Humidity delta: ");
     Serial.println(deltahumidity);
-  }
-  else {
-    deltahumidity = sdelta(deltahumidity, readhumidity - wmahumidity, beta);
-    wmahumidity = svalue(wmahumidity, readhumidity, alpha);
   }
   delay(2000);
 }

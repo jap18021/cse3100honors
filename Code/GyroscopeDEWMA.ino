@@ -26,22 +26,25 @@ void setup() {
   // At the start, assume the average to be the first read and delta to be 0
   IMU.readAcceleration(readx, ready, z);
   readx *= 100, ready *= 100;
+  // The map function re-maps a number from one range to another
   wmax = map(readx, -97, 97, -90, 90);
   wmay = map(ready, -100, 100, -90, 90);
   delay(2000);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // calculate expected values
   expectedx = wmax + deltax;
   expectedy = wmay + deltay;
+  // get new reads
   IMU.readAcceleration(readx, ready, z);
   readx *= 100, ready *= 100;
-  if (abs(readx - expectedx) > epsilonx || abs(ready - expectedy) > epsilony) {
-    deltax = sdelta(deltax, readx - expectedx, beta);
-    wmax = svalue(wmax, readx, alpha);
-    deltay = sdelta(deltay, ready - expectedy, beta);
-    wmay = svalue(wmay, ready, alpha);
+  deltax = sdelta(deltax, readx - expectedx, beta);
+  wmax = svalue(wmax, readx, alpha);
+  deltay = sdelta(deltay, ready - expectedy, beta);
+  wmay = svalue(wmay, ready, alpha);
+  // compare new wma with expected
+  if (abs(wmax - expectedx) > epsilonx || abs(wmay - expectedy) > epsilony) {
     Serial.print("Tilt WMA: ");
     if (wmax < 0) Serial.print("Down " + String(-wmax, 2) + " degrees, ");
     else Serial.print("Up " + String(wmax, 2) + " degrees, ");
@@ -52,12 +55,6 @@ void loop() {
     else Serial.print("Up " + String(deltax, 2) + " degrees, ");
     if (deltay < 0) Serial.println("Right " + String(-deltay, 2) + " degrees");
     else Serial.println("Left " + String(deltay, 2) + " degrees");
-  }
-  else {
-    deltax = sdelta(deltax, readx - expectedx, beta);
-    wmax = svalue(wmax, readx, alpha);
-    deltay = sdelta(deltay, ready - expectedy, beta);
-    wmay = svalue(wmay, ready, alpha);
   }
   delay(2000);
 }
